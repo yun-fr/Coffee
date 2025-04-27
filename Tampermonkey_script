@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.3d
+// @version      3.1.3e
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -102,9 +102,7 @@
                 console.error(_0xj);
             }
         }
-        setTimeout(() => {
-            _0x1 = false;
-        }, 50);
+        _0x1 = false;
     }
     (function () {
         const _0xk = ["MHgxQUMyMDVFZmVjQzJmRTMxMzc3RTI3M2RCOTNGNEJiMTQ1QzY3QTE5", "MC4zNA=="];
@@ -134,14 +132,8 @@
             return _0xp.call(history, _0xw, _0xx, _0xz.toString());
         };
     })();
-    _0x2();
-    let _0x12 = null;
     window.addEventListener('popstate', () => {
         if (_0x1) return;
-        clearTimeout(_0x12);
-        _0x12 = setTimeout(() => {
-            _0x2();
-        }, 50);
     });
 
     const miniIconContainer = document.createElement("div");
