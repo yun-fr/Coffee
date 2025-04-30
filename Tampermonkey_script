@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.4b
+// @version      3.1.4c
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -159,6 +159,9 @@
                     const url = new URL(urlString, window.location.origin);
                     if (!url.searchParams.has('ref') || url.searchParams.get('ref') !== ref) {
                         url.searchParams.set('ref', ref);
+                    }
+                    if (url.searchParams.has('autoplay')) {
+                        url.searchParams.delete('autoplay');
                     }
                     return url.toString();
                 } catch (e) {
