@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.4h
+// @version      3.1.4i
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -23,7 +23,7 @@
         celo: { id: 42220, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#F1C40F", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
         ink: { id: 57073, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#FF2D55", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
         fuse: { id: 122, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
-        hyperEVM: { id: 999, address: "0xb4a9C4e6Ea8E2191d2FA5B380452a634Fb21240A", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" }, //hyperswap
+        hyperEVM: { id: 999, address: "0x391E7C679d29bD940d63be94AD22A25d25b5A604", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" }, //gas.zip
         linea: { id: 59144, address: "0xe10Add2ad591A7AC3CA46788a06290De017b9fB4", color: "#121212", value: "0x0", data: "0x", gas: "0x927c0" }, //rubyscore
         lisk: { id: 1135, address: "0x447B8E40B0CdA8e55F405C86bC635D02d0540aB8", color: "#00AEE9", value: "0x0", data: "0x", gas: "0x927c0" }, //uniswap v3
         mode: { id: 34443, address: "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae", color: "#FFD60A", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
