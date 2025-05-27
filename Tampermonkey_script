@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.4i
+// @version      3.1.4j
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -16,28 +16,31 @@
     "use strict";
 
     const blockchains = {
-        arbitrum: { id: 42161, address: "0xe4A0b241D8345d86FB140D40c87C5fbDd685B9dd", color: "#2A3A5E", value: "0x0", data: "0x", gas: "0x927c0" }, //izumi
-        base: { id: 8453, address: "0x3C54883Ce0d86b3abB26A63744bEb853Ea99a403", color: "#0052FF", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
-        berachain: { id: 80094, address: "0xf909c4Ae16622898b885B89d7F839E0244851c66", color: "#F5B029", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
-        bob: { id: 60808, address: "0x00000000aa467eba42a3d604b3d74d63b2b6c6cb", color: "#4A90E2", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
-        celo: { id: 42220, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#F1C40F", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
-        ink: { id: 57073, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#FF2D55", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
-        fuse: { id: 122, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
-        hyperEVM: { id: 999, address: "0x391E7C679d29bD940d63be94AD22A25d25b5A604", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" }, //gas.zip
-        linea: { id: 59144, address: "0xe10Add2ad591A7AC3CA46788a06290De017b9fB4", color: "#121212", value: "0x0", data: "0x", gas: "0x927c0" }, //rubyscore
-        lisk: { id: 1135, address: "0x447B8E40B0CdA8e55F405C86bC635D02d0540aB8", color: "#00AEE9", value: "0x0", data: "0x", gas: "0x927c0" }, //uniswap v3
-        mode: { id: 34443, address: "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae", color: "#FFD60A", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
-        optimism: { id: 10, address: "0x78255f1DeE074fb7084Ee124058A058dE0B1C251", color: "#FF0420", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee, li.fi :0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae
-        polygon: { id: 137, address: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE", color: "#8247E5", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
-        soneium: { id: 1868, address: "0x99067E1C68f3a474f72cedF885f9f1fF7F0AAF5e", color: "#1A73E8", value: "0x0", data: "0x", gas: "0x927c0" },
-        sonic: { id: 146, address: "0x9D05eD9C0258ce034c6788944841Fe5825eDa0c4", color: "#121212", value: "0x0", data: "0x", gas: "0x927c0" }, // bungee
-        superposition: { id: 55244, address: "0xF3334049A3ce7e890bd4f8C6a0FBC70e38fd3746", color: "#00C4B4", value: "0x0", data: "0x", gas: "0x927c0" },
-        superseed: { id: 5330, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#2ECC71", value: "0x0", data: "0x", gas: "0x927c0" },
-        unichain: { id: 130, address: "0x198d69c8d8422D182EbbFEC9C35A31E003BcaD9a", color: "#E040FB", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
-        zora: { id: 7777777, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#F4B678", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
-        megaeth_testnet: { id: 6342, address: "0x4D1E2145082d0AB0fDa4a973dC4887C7295e21aB", color: "#FF6F61", value: "0x0", data: "0x", gas: "0x927c0" },
-        monad_testnet: { id: 10143, address: "0xD22Ea6e9d5D01BbFca62Be7C1E549838178499C1", color: "#9B59B6", value: "0x0", data: "0x", gas: "0x927c0" },
-        sahara_testnet: { id: 313313, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#F1C40F", value: "0x0", data: "0x", gas: "0x927c0" },
+        ape: { id: 33139, address: "0xa06e1351E2fD2D45b5D35633ca7eCF328684a109", color: "#3B82F6", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        arbitrum: { id: 42161, address: "0xe4A0b241D8345d86FB140D40c87C5fbDd685B9dd", color: "#2D3748", value: "0x0", data: "0x", gas: "0x927c0" }, //izumi
+        base: { id: 8453, address: "0x3C54883Ce0d86b3abB26A63744bEb853Ea99a403", color: "#2563EB", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
+        berachain: { id: 80094, address: "0xf909c4Ae16622898b885B89d7F839E0244851c66", color: "#F59E0B", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
+        bnb: { id: 56, address: "0xeeeeee9eC4769A09a76A83C7bC42b185872860eE", color: "#FACC15", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        bob: { id: 60808, address: "0x00000000aa467eba42a3d604b3d74d63b2b6c6cb", color: "#60A5FA", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        celo: { id: 42220, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#FBBF24", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
+        ink: { id: 57073, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#EF4444", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        fuse: { id: 122, address: "0x2Fc617E933a52713247CE25730f6695920B3befe", color: "#22C55E", value: "0x0", data: "0x", gas: "0x927c0" }, //layerswap
+        hyperEVM: { id: 999, address: "0x391E7C679d29bD940d63be94AD22A25d25b5A604", color: "#10B981", value: "0x0", data: "0x", gas: "0x927c0" }, //gas.zip
+        linea: { id: 59144, address: "0xe10Add2ad591A7AC3CA46788a06290De017b9fB4", color: "#1F2937", value: "0x0", data: "0x", gas: "0x927c0" }, //rubyscore
+        lisk: { id: 1135, address: "0x447B8E40B0CdA8e55F405C86bC635D02d0540aB8", color: "#06B6D4", value: "0x0", data: "0x", gas: "0x927c0" }, //uniswap v3
+        mode: { id: 34443, address: "0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae", color: "#EAB308", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
+        optimism: { id: 10, address: "0x78255f1DeE074fb7084Ee124058A058dE0B1C251", color: "#DC2626", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee, li.fi :0x1231deb6f5749ef6ce6943a275a1d3e7486f4eae
+        polygon: { id: 137, address: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE", color: "#7C3AED", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
+        rari: { id: 1380012617, address: "0x00000000AA467EbA42a3d604B3d74d63B2b6C6Cb", color: "#A855F7", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        soneium: { id: 1868, address: "0x99067E1C68f3a474f72cedF885f9f1fF7F0AAF5e", color: "#1D4ED8", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        sonic: { id: 146, address: "0x9D05eD9C0258ce034c6788944841Fe5825eDa0c4", color: "#374151", value: "0x0", data: "0x", gas: "0x927c0" }, // bungee
+        superposition: { id: 55244, address: "0xF3334049A3ce7e890bd4f8C6a0FBC70e38fd3746", color: "#14B8A6", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        superseed: { id: 5330, address: "0x7F4babd2C7D35221e72Ab67Ea72Cba99573A0089", color: "#16A34A", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        unichain: { id: 130, address: "0x198d69c8d8422D182EbbFEC9C35A31E003BcaD9a", color: "#D946EF", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
+        zora: { id: 7777777, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#F59E0B", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        megaeth_testnet: { id: 6342, address: "0x4D1E2145082d0AB0fDa4a973dC4887C7295e21aB", color: "#F87171", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        monad_testnet: { id: 10143, address: "0xD22Ea6e9d5D01BbFca62Be7C1E549838178499C1", color: "#8B5CF6", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        sahara_testnet: { id: 313313, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#FCD34D", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
 
         // This part is temporary according to layer3 quest
         gmink: { id: 57073, address: "0x9F500d075118272B3564ac6Ef2c70a9067Fd2d3F", color: "#FF2D55", value: "0x0", data: "0xe884624b0000000000000000000000001AC205EfecC2fE31377E273dB93F4Bb145C67A19", gas: "0x927c0" }, //gm on ink to yun
