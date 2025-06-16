@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.4j
+// @version      3.1.4k
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -46,7 +46,8 @@
         gmink: { id: 57073, address: "0x9F500d075118272B3564ac6Ef2c70a9067Fd2d3F", color: "#FF2D55", value: "0x0", data: "0xe884624b0000000000000000000000001AC205EfecC2fE31377E273dB93F4Bb145C67A19", gas: "0x927c0" }, //gm on ink to yun
         gmsuperpositon: { id: 55244, address: "0x7a8Ed5FB3E9B310c9c9DE78E605c2DaB35Ad2ccc", color: "#00C4B4", value: "0x0", data: "0x", gas: "0x927c0" }, // onchain gm on superposition
         baserelay: { id: 8453, address: "0xa5F565650890fBA1824Ee0F21EbBbF660a179934", color: "#0052FF", value: "0x0", data: "0x", gas: "0x927c0" }, //bungee
-        gdollar: { id: 122, address: "0xd253A5203817225e9768C05E5996d642fb96bA86", color: "#2ECC71", value: "0x0", data: "0x4e71d92d", gas: "0x927c0" }, // claim G dollar
+        gdollarfuse: { id: 122, address: "0xd253A5203817225e9768C05E5996d642fb96bA86", color: "#2ECC71", value: "0x0", data: "0x4e71d92d", gas: "0x927c0" }, // claim G dollar fuse
+        gdollarcelo: { id: 42220, address: "0x43d72Ff17701B2DA814620735C39C620Ce0ea4A1", color: "#2ECC71", value: "0x0", data: "0x4e71d92d", gas: "0x927c0" }, // claim G dollar celo
 
         //add personalize here (will be erase on update)
         //customize1 { id: 7777777, address: "0xDC3D8318Fbaec2de49281843f5bba22e78338146", color: "#FF5733", value: "0x0", data: "0x632a9a52", gas: "0x927c0" }, //Example : Vote on rubyscore on zora
