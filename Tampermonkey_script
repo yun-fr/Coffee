@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Layer3 autoref
 // @namespace    http://tampermonkey.net/
-// @version      3.1.4o
+// @version      3.1.4p
 // @description  Multitools script for app.layer3.xyz: referral + multichain transaction
 // @author       Yun
 // @match        https://app.layer3.xyz/*
@@ -34,6 +34,7 @@
         plume: { id: 98866, address: "0x836CaF2409D91dF0bdA01BC9F3cEC524ba1c571D", color: "#F97316", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
         polygon: { id: 137, address: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE", color: "#7C3AED", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
         rari: { id: 1380012617, address: "0x00000000AA467EbA42a3d604B3d74d63B2b6C6Cb", color: "#A855F7", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
+        sei: { id: 1329, address: "0x1231DEB6f5749EF6cE6943a275A1D3E7486F4EaE", color: "#FF2D55", value: "0x0", data: "0x", gas: "0x927c0" }, //li.fi
         soneium: { id: 1868, address: "0x99067E1C68f3a474f72cedF885f9f1fF7F0AAF5e", color: "#1D4ED8", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
         sonic: { id: 146, address: "0x9D05eD9C0258ce034c6788944841Fe5825eDa0c4", color: "#374151", value: "0x0", data: "0x", gas: "0x927c0" }, // bungee
         superposition: { id: 55244, address: "0xF3334049A3ce7e890bd4f8C6a0FBC70e38fd3746", color: "#14B8A6", value: "0x0", data: "0x", gas: "0x927c0" }, //relay
